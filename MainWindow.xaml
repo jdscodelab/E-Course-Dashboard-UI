@@ -1,0 +1,800 @@
+﻿<Window x:Class="ECourse_UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ECourse_UI"
+        xmlns:viewmodels="clr-namespace:ECourse_UI.ViewModels"
+        mc:Ignorable="d"
+        FontSize="15"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Normal"
+        Background="#01000000"
+        Foreground="#292934"
+        Title="MainWindow" Height="768" Width="1024">
+    <Window.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/assets/icons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="{x:Type ListBoxItem}">
+                <Setter Property="Height" Value="50"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                            <Border Background="{TemplateBinding Background}">
+                                <Grid Margin="46,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="15"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!--Menu Icon-->
+                                    <Path 
+                                    Stretch="Uniform"
+                                    Data="{Binding IconData}">
+                                        <Path.Style>
+                                            <Style TargetType="{x:Type Path}">
+                                                <Setter Property="Fill" Value="#5E82F5"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="False">
+                                                        <Setter Property="Fill" Value="#292934"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Path.Style>
+                                    </Path>
+
+                                    <!--Menu Text-->
+                                    <TextBlock 
+                                    Margin="15,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding MenuName}"
+                                    Grid.Column="1">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="True">
+                                                        <Setter Property="FontWeight" Value="Bold"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+
+                                    <!--Indicator-->
+                                    <Border 
+                                    CornerRadius="1"
+                                    Grid.Column="1"
+                                    Width="2"
+                                    HorizontalAlignment="Right"
+                                    Height="25"
+                                    Background="#5E82F5">
+                                        <Border.Style>
+                                            <Style TargetType="{x:Type Border}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="False">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="SearchBox" TargetType="{x:Type TextBox}">
+                <Setter Property="Foreground" Value="Silver"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="IBeam"/>
+                <Setter Property="Padding" Value="0,0,10,0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TextBox}">
+                            <Border>
+                                <Grid>
+                                    <TextBlock 
+                                        Text="Search Something..."
+                                        Cursor="IBeam"
+                                        TextAlignment="Left"
+                                        Margin="0,0,10,0"
+                                        VerticalAlignment="Center"
+                                        Foreground="LightGray">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TextBox}}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <ContentPresenter 
+                                        Content="{TemplateBinding Text}" 
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                </Grid>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+
+            <Style x:Key="TabButtonStyle" TargetType="{x:Type ToggleButton}">
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="Gray"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                            <Border Background="{TemplateBinding Background}">
+                                <Grid>
+                                    <ContentPresenter
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Content="{TemplateBinding Content}"/>
+
+                                    <!--Bottom Indicator-->
+                                    <Border 
+                                        Height="2"
+                                        Width="15"
+                                        Background="#5E82F5"
+                                        CornerRadius="1"
+                                        VerticalAlignment="Bottom">
+                                        <Border.Style>
+                                            <Style TargetType="{x:Type Border}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}}" Value="False">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="Foreground" Value="#5E82F5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="WindowButtonStyle" TargetType="{x:Type Button}">
+                <Setter Property="Height" Value="15"/>
+                <Setter Property="Width" Value="15"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+                <Setter Property="Opacity" Value=".5"/>
+                <!--<Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform AngleX="-21.413"/>
+                            <RotateTransform/>
+                            <TranslateTransform X="-2.941"/>
+                        </TransformGroup>
+                    </Setter.Value>
+                </Setter>-->
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Opacity" Value="1"/>
+                    </Trigger>                    
+                </Style.Triggers>
+            </Style>
+            
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="274"/>
+        </Grid.ColumnDefinitions>
+
+<!--Your choice if you want blur effect or not..-->
+        <Grid Background="White">
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsChecked, ElementName=cbBlur}" Value="True">
+                            <Setter Property="Opacity" Value=".4"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+        </Grid>
+
+        <!-- #region logo-->
+        <Grid 
+            Margin="48,39,0,0" 
+            HorizontalAlignment="Left" 
+            VerticalAlignment="Top">
+            <Rectangle RadiusX="10" RadiusY="10"
+                       Fill="#F1F1F9"
+                       Height="34" Width="34"/>
+
+            <TextBlock 
+                FontSize="17"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI Semibold"
+                Text="E"/>
+        </Grid>
+        <TextBlock 
+            Text="Course"
+            FontSize="17"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            FontFamily="Segoe UI Semibold"
+            Margin="87,45,0,0"/>
+        <!--#endregion-->
+
+
+        <!--Join Course Button-->
+        <Button
+            BorderThickness="0"
+            Background="#FF5E82F5"
+            Foreground="White"
+            Content="Join a course"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            Margin="0,111,0,0"
+            Width="122" Height="34">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="6"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+
+        <!--Menu Buttons-->
+        <ListBox 
+            Margin="0,165,0,280"
+            SelectedIndex="1"
+            ItemsSource="{Binding MenuItems}"
+            BorderThickness="0"
+            Background="Transparent"
+            Foreground="#292934">
+            <ListBox.DataContext>
+                <viewmodels:MenuViewModels/>
+            </ListBox.DataContext>
+        </ListBox>
+
+
+        <!--Upgrade Message-->
+        <StackPanel 
+            Margin="0,535,0,33"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom">
+            <Image
+                Source="/assets/upgrade.png"
+                Stretch="Uniform"
+                Height="80"/>
+            <TextBlock 
+                HorizontalAlignment="Center"
+                Margin="0,10">
+                <Run Text="Upgrade for"/>
+                <LineBreak/>
+                <Run Text="more resources"/>
+            </TextBlock>
+            <Button
+            BorderThickness="0"
+            Background="#FF5E82F5"
+            Foreground="White"
+            Content="Upgrade"
+            HorizontalAlignment="Center"
+            Width="122" Height="34">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="6"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+
+
+        <!--MiddlePage-->
+        <Grid Grid.Column="1" Background="White">
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsChecked, ElementName=cbBlur}" Value="True">
+                            <Setter Property="Opacity" Value=".6"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+        </Grid>
+        <!--#region SearchBox-->
+        <Border 
+            Grid.Column="1"
+            CornerRadius="10" 
+            Height="34"
+            Width="349"
+            Background="White"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top">
+            <Border.Style>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="Margin" Value="13,39,0,0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
+                            <Setter Property="Margin" Value="50,39,0,0"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="38"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <!--Icon-->
+                <Path 
+                Data="{StaticResource search}"
+                Stretch="Uniform"
+                Fill="Silver"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="15"/>
+
+                <!--Search textbox-->
+                <TextBox Grid.Column="1" Style="{StaticResource SearchBox}"/>
+            </Grid>
+        </Border>
+        <!--#endregion-->
+
+        <!--Notification Toggle Button-->
+        <!--You can add a popup or something later to open notification panel n all...-->
+        <ToggleButton 
+            Background="Transparent"
+            BorderThickness="0"
+            Grid.Column="1" 
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="0,39,26,0" 
+            Height="34"
+            Width="34">
+            <ToggleButton.Content>
+                <Path 
+                    Data="{StaticResource bell}"
+                    Fill="Silver"
+                    Width="15"
+                    Stretch="Uniform"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
+            </ToggleButton.Content>
+        </ToggleButton>
+
+        <!--All courses section-->
+        <TextBlock Text="All Courses"
+                   Grid.Column="1"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TitleStyle}">
+                    <Setter Property="Margin" Value="13,98,0,0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
+                            <Setter Property="Margin" Value="50,98,0,0"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <!--Tab styled buttons to switch between Ongoing, completed & favourite courses-->
+        <UniformGrid 
+            Grid.Column="1"
+            Columns="3"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="0,95,14,0"
+            Width="264"
+            Height="40">
+            <RadioButton 
+                IsChecked="True"
+                Content="Ongoing" 
+                GroupName="TabButton"
+                Style="{StaticResource TabButtonStyle}"/>
+            <RadioButton 
+                Content="Favourite" 
+                GroupName="TabButton"
+                Style="{StaticResource TabButtonStyle}"/>
+            <RadioButton 
+                Content="Completed" 
+                GroupName="TabButton"
+                Style="{StaticResource TabButtonStyle}"/>
+        </UniformGrid>
+
+        <!--Courses Cards-->
+        <ScrollViewer 
+            VerticalScrollBarVisibility="Hidden" 
+            Grid.Column="1"
+            Margin="0,146,0,0"
+            HorizontalAlignment="Center">
+            <ItemsControl ItemsSource="{Binding Courses}"
+                          HorizontalAlignment="Center">
+                <ItemsControl.DataContext>
+                    <viewmodels:CardsViewModel/>
+                </ItemsControl.DataContext>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <local:CustomCards/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <Grid Grid.Column="2" Background="White">
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsChecked, ElementName=cbBlur}" Value="True">
+                            <Setter Property="Opacity" Value=".4"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+        </Grid>
+        <!--to enable blur effect (Optional)-->
+        <CheckBox x:Name="cbBlur" Grid.Column="2" Content="Enable Blur" HorizontalAlignment="Left" Margin="180,749,0,0" VerticalAlignment="Top" Checked="CheckBox_Checked"/>
+        <StackPanel 
+            Grid.Column="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="5">
+            <Button Style="{StaticResource WindowButtonStyle}" Background="LightGreen" Click="Button_Click"/>
+            <Button Style="{StaticResource WindowButtonStyle}" Background="Gold" Click="Button_Click_1"/>
+            <Button Style="{StaticResource WindowButtonStyle}" Background="DarkRed" Click="Button_Click_2"/>
+        </StackPanel>
+        <!--Profile Image-->
+        <Rectangle 
+            Grid.Column="2"
+            RadiusX="10"
+            RadiusY="10"
+            Height="34"
+            Width="34"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Margin="25,39,0,0">
+            <Rectangle.Fill>
+                <ImageBrush ImageSource="/assets/user.png"/>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <!--User Name-->
+        <TextBlock 
+            Grid.Column="2"
+            Text="Alen Rogue"
+            FontSize="17"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            FontFamily="Segoe UI Semibold"
+            Margin="76,45,0,0"/>
+
+
+        <!--#region Lesson Progress-->
+        <TextBlock 
+            Text="Progress"
+            Grid.Column="2"
+            Margin="25,109,0,0"
+            Style="{StaticResource TitleStyle}"/>
+
+        <StackPanel 
+            Grid.Column="2"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            Margin="0,145,0,0">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="58"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
+
+                
+                <!--Icon-->
+                <Border 
+                    Background="#D2D9F3" 
+                    CornerRadius="5" 
+                    Height="30" 
+                    Width="30">
+                    <Path 
+                        Data="{StaticResource pencil}" 
+                        Width="15"
+                        Stretch="Uniform"
+                        Fill="#5E82F5"/>
+                </Border>
+                
+                <!--Title-->
+                <TextBlock
+                    Grid.Column="1">
+                    <Run Text="UI/UX Design" FontWeight="SemiBold"/>
+                    <LineBreak/>
+                    <Run Text="Advanced" FontSize="12"/>
+                </TextBlock>
+                
+                <!--Progressbar-->
+                <ProgressBar
+                    Grid.Column="2"
+                    Value="70"
+                    Background="#D2D9F3"
+                    Foreground="#5E82F5">
+                    <ProgressBar.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="3"/>
+                        </Style>
+                        <Style TargetType="{x:Type Rectangle}">
+                            <Setter Property="RadiusX" Value="3"/>
+                            <Setter Property="RadiusY" Value="3"/>
+                        </Style>
+                    </ProgressBar.Resources>
+                </ProgressBar>
+            </Grid>
+            <Grid Margin="0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="58"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
+
+
+                <!--Icon-->
+                <Border 
+                    Background="#CFF8FC" 
+                    CornerRadius="5" 
+                    Height="30" 
+                    Width="30">
+                    <Path 
+                        Data="{StaticResource camera}" 
+                        Width="15"
+                        Stretch="Uniform"
+                        Fill="#58C8E4"/>
+                </Border>
+
+                <!--Title-->
+                <TextBlock
+                    Grid.Column="1">
+                    <Run Text="Photography" FontWeight="SemiBold"/>
+                    <LineBreak/>
+                    <Run Text="Intermediate" FontSize="12"/>
+                </TextBlock>
+
+                <!--Progressbar-->
+                <ProgressBar
+                    Grid.Column="2"
+                    Value="40"
+                    Background="#CFF8FC"
+                    Foreground="#58C8E4">
+                    <ProgressBar.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="3"/>
+                        </Style>
+                        <Style TargetType="{x:Type Rectangle}">
+                            <Setter Property="RadiusX" Value="3"/>
+                            <Setter Property="RadiusY" Value="3"/>
+                        </Style>
+                    </ProgressBar.Resources>
+                </ProgressBar>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="58"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
+
+
+                <!--Icon-->
+                <Border 
+                    Background="#FFEFD5" 
+                    CornerRadius="5" 
+                    Height="30" 
+                    Width="30">
+                    <Path 
+                        Data="{StaticResource pencil}" 
+                        Width="15"
+                        Stretch="Uniform"
+                        Fill="#F0BF71"/>
+                </Border>
+
+                <!--Title-->
+                <TextBlock
+                    Grid.Column="1">
+                    <Run Text="Animation" FontWeight="SemiBold"/>
+                    <LineBreak/>
+                    <Run Text="Advanced" FontSize="12"/>
+                </TextBlock>
+
+                <!--Progressbar-->
+                <ProgressBar
+                    Grid.Column="2"
+                    Value="60"
+                    Background="#FFEFD5"
+                    Foreground="#F0BF71">
+                    <ProgressBar.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="3"/>
+                        </Style>
+                        <Style TargetType="{x:Type Rectangle}">
+                            <Setter Property="RadiusX" Value="3"/>
+                            <Setter Property="RadiusY" Value="3"/>
+                        </Style>
+                    </ProgressBar.Resources>
+                </ProgressBar>
+            </Grid>
+
+        </StackPanel>
+        <!--#endregion-->
+
+        <!--#region Upcoming Task-->
+        <TextBlock 
+            Text="Upcoming Task"
+            Grid.Column="2"
+            Margin="25,312,0,0"
+            Style="{StaticResource TitleStyle}"/>
+
+        <StackPanel 
+            Grid.Column="2"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            Margin="0,348,0,0">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="58"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+
+                <!--Icon-->
+                <Border 
+                    Background="#D2D9F3" 
+                    CornerRadius="5" 
+                    Height="30" 
+                    Width="30">
+                    <Path 
+                        Data="{StaticResource pencil}" 
+                        Width="15"
+                        Stretch="Uniform"
+                        Fill="#5E82F5"/>
+                </Border>
+
+                <!--Title-->
+                <TextBlock
+                    Grid.Column="1">
+                    <Run Text="UI/UX Design Discussion" FontWeight="SemiBold"/>
+                    <LineBreak/>
+                    <Run Text="25 Dec 2019, Tuesday" FontSize="12"/>
+                </TextBlock>
+            </Grid>
+            <Grid Margin="0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="58"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+
+                <!--Icon-->
+                <Border 
+                    Background="#CFF8FC" 
+                    CornerRadius="5" 
+                    Height="30" 
+                    Width="30">
+                    <Path 
+                        Data="{StaticResource camera}" 
+                        Width="15"
+                        Stretch="Uniform"
+                        Fill="#58C8E4"/>
+                </Border>
+
+                <!--Title-->
+                <TextBlock
+                    Grid.Column="1">
+                    <Run Text="Photo Sharing" FontWeight="SemiBold"/>
+                    <LineBreak/>
+                    <Run Text="28 Dec 2019, Monday" FontSize="12"/>
+                </TextBlock>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="58"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+
+                <!--Icon-->
+                <Border 
+                    Background="#FFEFD5" 
+                    CornerRadius="5" 
+                    Height="30" 
+                    Width="30">
+                    <Path 
+                        Data="{StaticResource pencil}" 
+                        Width="15"
+                        Stretch="Uniform"
+                        Fill="#F0BF71"/>
+                </Border>
+
+                <!--Title-->
+                <TextBlock
+                    Grid.Column="1">
+                    <Run Text="Animation - 3D Animation" FontWeight="SemiBold"/>
+                    <LineBreak/>
+                    <Run Text="27 Dec 2019, Sunday" FontSize="12"/>
+                </TextBlock>
+            </Grid>
+
+        </StackPanel>
+        <!--#endregion-->
+
+
+        <Border 
+            Grid.Column="2"
+            Margin="0,0,0,33" 
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            Height="110"
+            Width="196">
+            <Grid>
+                <Border 
+                    CornerRadius="10"
+                    Background="White"
+                    Opacity=".5"/>
+                <TextBlock 
+                    Margin="9"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    FontWeight="SemiBold"
+                    TextWrapping="Wrap"
+                    Text="Also available for your mobile device:"/>
+                <Image
+                    Source="/assets/doodle.png"
+                    Stretch="Uniform"
+                    Width="40" 
+                    Height="40"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Margin="9"/>
+                <Image
+                    Source="/assets/mango.png"
+                    Stretch="Uniform"
+                    Width="40" 
+                    Height="40"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Margin="54,0,0,9"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
